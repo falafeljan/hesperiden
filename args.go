@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fallafeljan/docker-recreate/lib"
+	"github.com/falafeljan/docker-recreate"
 	"io/ioutil"
 	"os"
 	"path/filepath"

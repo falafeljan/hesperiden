@@ -31,7 +31,11 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/fallafeljan/docker-recreate"
+  name = "github.com/falafeljan/docker-recreate"
+
+[[constraint]]
+  name = "github.com/falafeljan/gin-simple-token-middleware"
+  version = "0.1.1"
 
 [[override]]
   name = "github.com/docker/docker"

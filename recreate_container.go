@@ -2,7 +2,8 @@ package main
 
 import (
 	"errors"
-	recreate "github.com/fallafeljan/docker-recreate/lib"
+	recreate "github.com/falafeljan/docker-recreate"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/graphql-go/graphql"
 )
 
@@ -31,16 +32,21 @@ func recreateContainer(
 		return nil, errors.New("internal error")
 	}
 
-	options := recreate.Options{
+	client, err := docker.NewClient("unix:///var/run/docker.sock")
+	if err != nil {
+		return nil, err
+	}
+
+	dockerOptions := recreate.DockerOptions{
 		PullImage:       true,
 		DeleteContainer: true,
 		Registries:      registries}
+	context := recreate.NewContextWithClient(dockerOptions, client)
 
-	recreation, err := recreate.Recreate(
-		"unix:///var/run/docker.sock",
+	recreation, err := context.Recreate(
 		tokenConf.ContainerID,
 		tokenConf.ImageTag,
-		&options)
+		recreate.ContainerOptions{})
 
 	if err != nil {
 		return nil, err
