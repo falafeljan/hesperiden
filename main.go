@@ -12,19 +12,19 @@ import (
 func main() {
 	args := getArgs()
 	options := redis.Options{
-		Addr: strings.Join([]string{args.redisHost, args.redisPort}, ":"),
+		Addr: strings.Join([]string{args.RedisHost, args.RedisPort}, ":"),
 		DB:   0,
 	}
 
 	client := redis.NewClient(&options)
-	tokenContext := NewTokenContext(client, args.redisPrefix)
+	tokenContext := NewTokenContext(client, args.RedisPrefix)
 
 	_, err := client.Ping().Result()
 	if err != nil {
 		panic(err)
 	}
 
-	if args.inProduction {
+	if args.InProduction {
 		gin.SetMode("release")
 	}
 
@@ -40,11 +40,11 @@ func main() {
 	router := gin.Default()
 
 	router.ForwardedByClientIP = true
-	router.Use(limiterMiddleware(client, args.rateLimit))
+	router.Use(limiterMiddleware(client, args.RateLimit))
 
 	group := router.Group("/", tokenmiddleware.NewHandler(token))
 	group.POST("/graphql", createGraphQLHandler(tokenContext, args))
 
 	log.Fatal(router.Run(
-		strings.Join([]string{":", args.httpPort}, "")))
+		strings.Join([]string{":", args.HTTPPort}, "")))
 }

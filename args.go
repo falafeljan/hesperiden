@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/caarlos0/env"
 	"github.com/falafeljan/docker-recreate"
 	"io/ioutil"
 	"os"
@@ -12,24 +13,13 @@ import (
 
 // Args describe arguments we expect from the environment
 type Args struct {
-	authUser     string
-	authPassword string
-	httpPort     string
-	inProduction bool
-	rateLimit    string
-	redisHost    string
-	redisPort    string
-	redisPrefix  string
-	registries   []recreate.RegistryConf
-}
-
-var defaultSettings = Args{
-	inProduction: false,
-	httpPort:     "80",
-	rateLimit:    "30-M",
-	redisHost:    "127.0.0.1",
-	redisPort:    "6379",
-	redisPrefix:  "token",
+	HTTPPort     string `env:"HTTP_PORT" envDefault:"80"`
+	InProduction bool   `env:"PRODUCTION" envDefault:"false"`
+	RateLimit    string `env:"RATE_LIMIT" envDefault:"30-M"`
+	RedisHost    string `env:"REDIS_HOST" envDefault:"127.0.0.1"`
+	RedisPort    string `env:"REDIS_PORT" envDefault:"6379"`
+	RedisPrefix  string `env:"REDIS_PREFIX" envDefault:"token"`
+	Registries   []recreate.RegistryConf
 }
 
 func getRegistries() (registries []recreate.RegistryConf) {
@@ -63,44 +53,15 @@ func getRegistries() (registries []recreate.RegistryConf) {
 	return parsedRegistries
 }
 
-func getArgs() (args *Args) {
-	envArgs := Args{
-		authUser:     os.Getenv("AUTH_USER"),
-		authPassword: os.Getenv("AUTH_PASSWORD"),
-		inProduction: os.Getenv("PRODUCTION") == "true",
-		httpPort:     os.Getenv("HTTP_PORT"),
-		rateLimit:    os.Getenv("RATE_LIMIT"),
-		redisHost:    os.Getenv("REDIS_HOST"),
-		redisPort:    os.Getenv("REDIS_PORT"),
-		redisPrefix:  os.Getenv("REDIS_PREFIX"),
-		registries:   getRegistries(),
+func getArgs() Args {
+	args := Args{}
+	err := env.Parse(&args)
+
+	if err != nil {
+		panic(fmt.Sprintf("Error while parsing configuration: %+v\n", err))
 	}
 
-	if envArgs.inProduction && (envArgs.authUser == "" || envArgs.authPassword == "") {
-		fmt.Println("IMPORTANT: When in production, you should secure the " +
-			"service by enforcing HTTP authentication (`AUTH_USER`, " +
-			"`AUTH_PASSWORD`). Please refer to the documentation.")
-	}
+	args.Registries = getRegistries()
 
-	if envArgs.httpPort == "" {
-		envArgs.httpPort = defaultSettings.httpPort
-	}
-
-	if envArgs.rateLimit == "" {
-		envArgs.rateLimit = defaultSettings.rateLimit
-	}
-
-	if envArgs.redisHost == "" {
-		envArgs.redisHost = defaultSettings.redisHost
-	}
-
-	if envArgs.redisPort == "" {
-		envArgs.redisPort = defaultSettings.redisPort
-	}
-
-	if envArgs.redisPrefix == "" {
-		envArgs.redisPrefix = defaultSettings.redisPrefix
-	}
-
-	return &envArgs
+	return args
 }

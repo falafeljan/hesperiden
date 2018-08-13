@@ -6,11 +6,11 @@ import (
 	handler "github.com/graphql-go/handler"
 )
 
-func createGraphQLHandler(tokenContext TokenContext, args *Args) gin.HandlerFunc {
+func createGraphQLHandler(tokenContext TokenContext, args Args) gin.HandlerFunc {
 	rootMutation := graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
-			"recreateContainer": createContainerRecreationMutation(tokenContext, args.registries),
+			"recreateContainer": createContainerRecreationMutation(tokenContext, args.Registries),
 			"createToken":       createTokenCreationMutation(tokenContext),
 			"revokeToken":       createTokenRevocationMutation(tokenContext),
 		},
