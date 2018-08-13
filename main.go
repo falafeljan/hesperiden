@@ -38,8 +38,7 @@ func main() {
 		"For more information, please refer to the documentation.\n\n", token)
 
 	router := gin.Default()
-
-	router.ForwardedByClientIP = true
+	router.Use(createCORSMiddleware(args.AllowedOrigins))
 	router.Use(limiterMiddleware(client, args.RateLimit))
 
 	group := router.Group("/", tokenmiddleware.NewHandler(token))

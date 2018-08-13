@@ -13,13 +13,14 @@ import (
 
 // Args describe arguments we expect from the environment
 type Args struct {
-	HTTPPort     string `env:"HTTP_PORT" envDefault:"80"`
-	InProduction bool   `env:"PRODUCTION" envDefault:"false"`
-	RateLimit    string `env:"RATE_LIMIT" envDefault:"30-M"`
-	RedisHost    string `env:"REDIS_HOST" envDefault:"127.0.0.1"`
-	RedisPort    string `env:"REDIS_PORT" envDefault:"6379"`
-	RedisPrefix  string `env:"REDIS_PREFIX" envDefault:"token"`
-	Registries   []recreate.RegistryConf
+	AllowedOrigins []string `env:"ALLOWED_ORIGINS" envSeparator:"," envDefault:"*"`
+	HTTPPort       string   `env:"HTTP_PORT" envDefault:"80"`
+	InProduction   bool     `env:"PRODUCTION" envDefault:"false"`
+	RateLimit      string   `env:"RATE_LIMIT" envDefault:"30-M"`
+	RedisHost      string   `env:"REDIS_HOST" envDefault:"127.0.0.1"`
+	RedisPort      string   `env:"REDIS_PORT" envDefault:"6379"`
+	RedisPrefix    string   `env:"REDIS_PREFIX" envDefault:"token"`
+	Registries     []recreate.RegistryConf
 }
 
 func getRegistries() (registries []recreate.RegistryConf) {
